@@ -53,6 +53,24 @@ class FdcService:
         """Initialize the FDC service."""
         self._base_url = "http://192.168.100.187:5070"
 
+    async def create_product_delivery(self, product_no: float, tank_no: float, volume_to_deliver: float) -> bool:
+        """
+        Create a product delivery.
+        """
+        url = f"{self._base_url}/product-delivery"
+        data = {
+            "ProductNo": product_no,
+            "TankNo": tank_no,
+            "VolumeToDeliver": volume_to_deliver
+        }
+        try:
+            response = requests.post(url, json=data)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+            return True
+        except Exception as e:
+            print(f"Error creating product delivery: {e}")
+            return False
+
     async def get_tank_delivery(self, device_id: Optional[int] = None) -> Optional[TankDeliveryResponse]:
         """
         Get tank delivery information.
@@ -81,7 +99,7 @@ class FdcService:
 mcp = FastMCP("FdcToolPython")
 fdc_service = FdcService()
 
-@mcp.tool()
+@mcp.resource("tank://delivery")
 async def get_tanks_deliveries() -> TankDeliveryResponse:
     """
     Get the latest tank delivery data for all tanks.
@@ -93,7 +111,7 @@ async def get_tanks_deliveries() -> TankDeliveryResponse:
     response = await fdc_service.get_tank_delivery(None)
     return response
 
-@mcp.tool()
+@mcp.resource("tank://delivery/{device_id}")
 async def get_tank_delivery(device_id: int) -> TankDeliveryResponse:
     """
     Get the latest tank delivery data for a specific tank.
@@ -107,3 +125,21 @@ async def get_tank_delivery(device_id: int) -> TankDeliveryResponse:
     print(f"Get latest tank delivery data for device {device_id}")
     response = await fdc_service.get_tank_delivery(device_id)
     return response
+
+@mcp.tool()
+async def create_product_delivery(product_no: float, tank_no: float, volume_to_deliver: float) -> str:
+    """
+    Get the latest tank delivery data for all tanks.
+    """
+    print(f"Create product delivery for product {product_no} in tank {tank_no} with volume {volume_to_deliver}")
+    response = await fdc_service.create_product_delivery(product_no, tank_no, volume_to_deliver)
+    if not response:
+        return "Error creating product delivery"
+    else:
+        return "Product delivery created successfully"
+
+@mcp.prompt()
+async def tank_delivery_prompt(product_no: float, tank_no: float, volume_to_deliver: float) -> str:
+    prompt = f"I need to create a product delivery of product ${product_no}, with volume ${volume_to_deliver} in tank ${tank_no}."
+    return prompt
+
