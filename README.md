@@ -36,4 +36,48 @@ MCP enables AI systems to:
 - Pydantic models for proper type validation and serialization
 - Asynchronous service implementation for better performance
 
-## Project Structure# FdcPythonMcpServer
+## Project Structure
+
+The project is organized as follows:
+
+- `main.py`: Entry point of the application, contains test code to verify FDC service functionality
+- `tools/`: Directory containing MCP tool implementations
+  - `fdc_tool.py`: Implementation of the FDC service with tank delivery data functionality
+  - `hello_tool.py`: Simple example tool for testing and demonstration purposes
+- `pyproject.toml`: Project dependencies and metadata
+- `.git/`: Git repository metadata
+- `.idea/`: JetBrains IDE configuration files
+- `__pycache__/`: Python bytecode cache directory
+
+The application follows a modular design pattern where each tool is implemented as a separate module within the tools directory. This allows for easy extension with additional MCP-compatible tools in the future.
+
+## JSON Claude MCP File locally
+
+````json lines
+{
+  "mcpServers": {
+    "Demo": {
+      "command": "/Users/[User]/.local/bin/uv",
+      "args": [
+        "run",
+        "--with",
+        "mcp[cli]",
+        "mcp",
+        "run",
+        "/Users/[User]/Documents/Areas/Courses-Mcp/python/src/tools/hello_tool.py"
+      ]
+    },
+    "FdcToolPython": {
+      "command": "/Users/[user]/.local/bin/uv",
+      "args": [
+        "run",
+        "--with",
+        "mcp[cli]",
+        "mcp",
+        "run",
+        "/Users/[user]/Documents/Areas/Courses-Mcp/python/src/tools/fdc_tool.py"
+      ]
+    }
+  }
+}
+````
